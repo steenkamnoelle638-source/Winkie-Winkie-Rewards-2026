@@ -19,6 +19,8 @@ const participants = [
   ["jaco", "Jaco Nel", "Jaco", "Nominee", "/manus-storage/async-images/fHeXMoknvP5m6EhQBVKY2T/image-3.webp", "sage"],
   ["mia", "Mia Botha", "Mia", "Nominee", "/manus-storage/async-images/fHeXMoknvP5m6EhQBVKY2T/image-4.webp", "cream"],
   ["talia", "Talia Roos", "Talia", "Nominee", "/manus-storage/async-images/fHeXMoknvP5m6EhQBVKY2T/image-5.webp", "blue"],
+  ["deelnemer6", "Deelnemer 6", "Deelnemer 6", "Nominee", "", "plum"],
+  ["deelnemer7", "Deelnemer 7", "Deelnemer 7", "Nominee", "", "rose"],
 ];
 const questions = [
   ["q1", "energy", "Die Vibes", "Beste entrance", "Wie bring die meeste main-character energy wanneer hulle instap?", "Opening scene", 1],
@@ -28,33 +30,15 @@ const questions = [
   ["q5", "chaos", "Die Chaos", "Beste one-liner", "Wie lewer altyd die quote wat die groep vir maande herhaal?", "Comic relief", 1.1],
   ["q6", "chaos", "Die Chaos", "Mees onverwags", "Wie verras jou elke keer met ’n nuwe plot twist?", "Plot twist", 1],
 ];
-const demoCounts = {
-  q1: { lian: 8, mieke: 5, jaco: 11, mia: 7, talia: 9 },
-  q2: { lian: 7, mieke: 10, jaco: 6, mia: 9, talia: 8 },
-  q3: { lian: 12, mieke: 8, jaco: 7, mia: 11, talia: 6 },
-  q4: { lian: 9, mieke: 11, jaco: 5, mia: 8, talia: 7 },
-  q5: { lian: 6, mieke: 13, jaco: 10, mia: 7, talia: 9 },
-  q6: { lian: 8, mieke: 7, jaco: 9, mia: 6, talia: 12 },
-};
-
 function seed() {
-  const participantCount = db.prepare("SELECT COUNT(*) AS count FROM participants").get().count;
-  if (participantCount === 0) {
-    const insert = db.prepare("INSERT INTO participants (id, name, short_name, role, photo, accent) VALUES (?, ?, ?, ?, ?, ?)");
-    for (const row of participants) insert.run(...row);
-  }
-  const questionCount = db.prepare("SELECT COUNT(*) AS count FROM questions").get().count;
-  if (questionCount === 0) {
-    const insert = db.prepare("INSERT INTO questions (id, main_category_id, main_category, subcategory, prompt, kicker, weight) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    for (const row of questions) insert.run(...row);
-  }
-  const countRows = db.prepare("SELECT COUNT(*) AS count FROM vote_counts").get().count;
-  if (countRows === 0) {
-    const insert = db.prepare("INSERT INTO vote_counts (question_id, candidate_id, votes) VALUES (?, ?, ?)");
-    for (const [questionId, counts] of Object.entries(demoCounts)) {
-      for (const [candidateId, votes] of Object.entries(counts)) insert.run(questionId, candidateId, votes);
-    }
-  }
+  const insertParticipant = db.prepare("INSERT INTO participants (id, name, short_name, role, photo, accent) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING");
+  for (const row of participants) insertParticipant.run(...row);
+  const insertQuestion = db.prepare("INSERT INTO questions (id, main_category_id, main_category, subcategory, prompt, kicker, weight) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING");
+  for (const row of questions) insertQuestion.run(...row);
+  const insertCount = db.prepare("INSERT INTO vote_counts (question_id, candidate_id, votes) VALUES (?, ?, 0) ON CONFLICT(question_id, candidate_id) DO NOTHING");
+  for (const question of questions) for (const participant of participants) insertCount.run(question[0], participant[0]);
+  // Remove old fabricated totals only if no actual ballots have been cast.
+  if (db.prepare("SELECT COUNT(*) AS count FROM votes").get().count === 0) db.exec("UPDATE vote_counts SET votes = 0");
 }
 seed();
 

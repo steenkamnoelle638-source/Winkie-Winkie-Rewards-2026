@@ -1,14 +1,22 @@
 # Vriende Oscar Rewards
 
-React / Express / tRPC / Drizzle starter, adapted from the Sandbox web-db-user template.
+’n Eenvoudige stemwebwerf vir die vriendegroep se Oscars. Die toepassing se eie kode gebruik gewone HTML, CSS en JavaScript; stemme en deelnemers word in SQLite gehou.
 
-- `pnpm dev`: development server; honors `PORT` (default 3000).
-- `pnpm build` / `pnpm start`: build and serve `dist/index.js` and `dist/public/`.
-- `pnpm db:migrate`: apply checked-in migrations. `pnpm db:push`: generate and apply new schema changes.
-- `pnpm check` / `pnpm test`: types and application tests.
+## Begin plaaslik
 
-Start with the Webdev skill's default-template guide. Platform login, storage, payments and service contracts live in its shared references; read the relevant capability before extending its helper.
+Vereis Node.js 22.5 of nuwer.
 
-`server/_core/publicConfig.ts` exposes only named public runtime values. Private keys stay server-side. The platform serves managed `/manus-storage/` assets; the application does not register a second proxy.
+```sh
+pnpm install
+pnpm dev
+```
 
-Platform configuration is readable and editable through `webdev.config`. Default settings are initial values, not enforced constraints. The agent may modify the files, commands and configuration or follow the flexible guide for another stack.
+Die webwerf is by `http://localhost:3000` beskikbaar. Stel `PORT` om ’n ander poort te kies, `SQLITE_PATH` om die databasislêer te skuif, en `ADMIN_PASSWORD` om die admin-wagwoord te stel (die demonstrasie-terugval is `oscar2026`).
+
+## Belangrike lêers
+
+- `public/index.html`, `public/styles.css`, `public/app.js`: gebruikerskoppelvlak en stemvloei.
+- `server.js`: JavaScript API-bediener met SQLite-integrasie.
+- `data/schema.sql`: SQLite-skema; die runtime-databasis (`data/awards.sqlite`) word plaaslik geskep en nie as kode gestoor nie.
+
+Die saadlys bevat sewe deelnemers. Deelnemer 6 en 7 is tydelike plekhouers totdat hul regte name en foto’s bygevoeg word. Nuwe installasies begin met nul stemme. Die repository bevat ook pakketbestuurder- en platformkonfigurasie-lêers wat nodig is om die app te installeer en uit te voer; hulle is nie deel van die webwerf se runtime-kode nie.
