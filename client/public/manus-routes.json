@@ -1,0 +1,9 @@
+{
+  "routes": [
+    { "path": "/", "title": "Vriende Oscar Rewards" },
+    { "path": "/vote", "title": "Stem nou" },
+    { "path": "/results", "title": "Resultate" },
+    { "path": "/ranking", "title": "Rankings" },
+    { "path": "/404", "title": "Bladsy nie gevind nie" }
+  ]
+}
